@@ -4,6 +4,12 @@ setlocal
 
 cd /d "%~dp0"
 
+if not exist "config.json" (
+  copy "config.example.json" "config.json" >nul
+  echo 未检测到 config.json，已自动从 config.example.json 创建默认配置。
+  echo.
+)
+
 if "%~1"=="--check" (
   echo start-overlay ok
   exit /b 0
@@ -20,6 +26,8 @@ echo  2. OOPZ built-in screen overlay is enabled
 echo.
 echo After startup, use this URL in OBS Browser Source:
 echo  http://127.0.0.1:5173/overlay
+echo.
+echo 如需修改配置，请运行 "配置设置.bat"
 echo.
 
 where python >nul 2>nul

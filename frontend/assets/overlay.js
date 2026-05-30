@@ -11,6 +11,9 @@ let overlayConfig = {
   highlightScale: 1.06,
   showIds: true,
   showDisplayNames: true,
+  idFontSize: 11,
+  nameFontSize: 15,
+  nameEllipsis: true,
 };
 
 const cards = new Map();
@@ -32,6 +35,10 @@ function applyConfig() {
   document.documentElement.style.setProperty("--dim-opacity", String(overlayConfig.dimOpacity));
   document.documentElement.style.setProperty("--inactive-grayscale", String(clamp01(overlayConfig.inactiveGrayscale)));
   document.documentElement.style.setProperty("--highlight-scale", String(overlayConfig.highlightScale));
+  document.documentElement.style.setProperty("--id-font-size", `${overlayConfig.idFontSize}px`);
+  document.documentElement.style.setProperty("--name-font-size", `${overlayConfig.nameFontSize}px`);
+  document.documentElement.style.setProperty("--name-ellipsis", overlayConfig.nameEllipsis ? "ellipsis" : "clip");
+  document.documentElement.style.setProperty("--name-white-space", overlayConfig.nameEllipsis ? "nowrap" : "normal");
 }
 
 function setStatus(message, isError = false) {

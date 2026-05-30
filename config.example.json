@@ -11,7 +11,10 @@
     "inactiveGrayscale": 0.0,
     "highlightScale": 1.06,
     "showIds": true,
-    "showDisplayNames": true
+    "showDisplayNames": true,
+    "idFontSize": 11,
+    "nameFontSize": 15,
+    "nameEllipsis": true
   },
   "oopz": {
     "mode": "oopz-local"

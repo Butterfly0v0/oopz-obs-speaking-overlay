@@ -35,27 +35,10 @@ ws://127.0.0.1:10274/
 - 根据成员标识稳定分配不同颜色。
 - 头像从 OOPZ 本地临时缓存读取，并通过本地 `/api/avatar` 安全提供给浏览器源。
 - 保留 `mock` 模式，方便没有打开 OOPZ 时预览界面。
+- 支持通过交互式 BAT 菜单修改配置，无需手动编辑 JSON。
+- 支持自定义昵称/ID 字体大小、名称框宽度与头像同宽、昵称过长时省略号或换行显示。
 
 ## 快速启动
-
-### 从 GitHub 获取
-
-仓库地址：<https://github.com/Butterfly0v0/oopz-obs-speaking-overlay>
-
-**方式一：Git 克隆（推荐）**
-
-```powershell
-git clone https://github.com/Butterfly0v0/oopz-obs-speaking-overlay.git
-cd oopz-obs-speaking-overlay
-```
-
-**方式二：下载 ZIP**
-
-1. 打开上方仓库链接。
-2. 点击 **Code** → **Download ZIP**。
-3. 解压 ZIP 文件，进入 `oopz-obs-speaking-overlay` 文件夹。
-
-### 安装依赖
 
 首次使用前，先安装 requirements。不熟悉终端命令的用户，直接双击：
 
@@ -77,8 +60,6 @@ install-requirements.bat
 python -m pip install -r .\requirements.txt
 ```
 
-### 启动程序
-
 先打开 OOPZ 客户端，并开启 OOPZ 自带屏幕覆盖功能。
 
 不熟悉终端命令的用户，直接双击：
@@ -93,13 +74,12 @@ python -m pip install -r .\requirements.txt
 start-overlay.bat
 ```
 
-也可以通过终端启动（需先进入项目目录）：
+也可以通过终端启动：
 
 ```powershell
+cd .\oopz-obs-speaking-overlay
 python .\backend\app.py
 ```
-
-### 打开叠加层
 
 浏览器或 OBS 中打开：
 
@@ -109,10 +89,10 @@ http://127.0.0.1:5173/overlay
 
 ## OBS 接入
 
-1. 在 OBS 中添加“浏览器”源。
+1. 在 OBS 中添加"浏览器"源。
 2. URL 填写 `http://127.0.0.1:5173/overlay`。
 3. 建议初始尺寸使用 `800 x 220`，竖排布局可用 `320 x 600`。
-4. 勾选“关闭源时关闭浏览器源”，方便刷新调试。
+4. 勾选"关闭源时关闭浏览器源"，方便刷新调试。
 5. 页面背景默认透明，可直接叠到直播画面上。
 
 ## 配置
@@ -122,6 +102,53 @@ http://127.0.0.1:5173/overlay
 ```powershell
 Copy-Item .\config.example.json .\config.json
 ```
+
+### 交互式配置编辑（推荐）
+
+双击运行 `配置设置.bat`（或 `configure.bat`），即可通过命令行菜单修改常用配置：
+
+```text
+==================================================
+  OOPZ OBS Speaking Overlay 配置菜单
+==================================================
+
+  [服务器设置]
+     1. 服务器地址                                    当前值: 127.0.0.1
+     2. 服务器端口                                    当前值: 5173
+
+  [叠加层样式]
+     3. 叠加层标题                                    当前值: OOPZ OBS Speaking Overlay
+     4. 布局方向 [horizontal / vertical / grid]      当前值: horizontal
+     5. 头像尺寸 (像素)                                当前值: 72
+     6. 暗色透明度 (0.0 ~ 1.0)                        当前值: 1.0
+     7. 非活动灰度 (0.0 ~ 1.0)                        当前值: 0.0
+     8. 高亮缩放 (如 1.06)                            当前值: 1.06
+     9. 显示ID [true / false]                      当前值: True
+    10. 显示昵称 [true / false]                      当前值: True
+    11. ID字体大小 (像素)                              当前值: 11
+    12. 昵称字体大小 (像素)                              当前值: 15
+    13. 昵称过长用省略号 [true / false]                   当前值: True
+
+  [OOPZ 连接]
+    14. 数据源模式 [oopz-local / mock]                当前值: oopz-local
+    15. OOPZ本地地址                                 当前值: 127.0.0.1
+    16. OOPZ本地端口                                 当前值: 10274
+    17. OOPZ本地路径                                 当前值: /
+    18. 重连延迟秒数                                   当前值: 2
+
+  [Mock 设置]
+    19. 说话切换间隔 (毫秒)                              当前值: 1600
+
+  [其他]
+    20. Mock 用户管理 (添加/删除/修改模拟用户)
+    21. 退出
+==================================================
+  请输入编号:
+```
+
+输入对应编号即可修改，支持类型自动转换（布尔值、整数、浮点数、字符串）。
+
+### 手动配置
 
 默认关键配置：
 
@@ -145,6 +172,9 @@ Copy-Item .\config.example.json .\config.json
 - `overlay.dimOpacity`：无人说话时的暗色透明度。
 - `overlay.inactiveGrayscale`：无人说话时的黑白程度，范围 `0` 到 `1`；`0` 保留原本颜色，`1` 为完全黑白。
 - `overlay.highlightScale`：说话高亮时的缩放强度。
+- `overlay.idFontSize`：ID 字体大小（像素）。
+- `overlay.nameFontSize`：昵称字体大小（像素）。
+- `overlay.nameEllipsis`：`true` 昵称过长显示省略号，`false` 换行显示完整内容。
 - `oopz.mode`：`oopz-local` 使用真实 OOPZ 覆盖层数据；`mock` 使用模拟数据。
 - `oopzLocal.port`：OOPZ 本地覆盖层 WebSocket 端口，当前默认是 `10274`。
 

@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>OOPZ OBS Speaking Overlay</title>
+    <link rel="stylesheet" href="/assets/styles.css" />
+  </head>
+  <body>
+    <main id="overlay" class="overlay overlay--horizontal" aria-live="polite">
+      <div class="status" id="status">Connecting...</div>
+      <section id="users" class="users"></section>
+    </main>
+    <template id="user-card-template">
+      <article class="user-card">
+        <div class="avatar-wrap">
+          <img class="avatar" alt="" />
+          <div class="avatar-fallback"></div>
+        </div>
+        <div class="nameplate">
+          <span class="display-name"></span>
+          <span class="user-id"></span>
+        </div>
+      </article>
+    </template>
+    <script src="/assets/overlay.js" type="module"></script>
+  </body>
+</html>

@@ -1,0 +1,48 @@
+{
+  "server": {
+    "host": "127.0.0.1",
+    "port": 5173
+  },
+  "overlay": {
+    "title": "OOPZ OBS Speaking Overlay",
+    "layout": "horizontal",
+    "avatarSize": 72,
+    "dimOpacity": 1.00,
+    "inactiveGrayscale": 0.0,
+    "highlightScale": 1.06,
+    "showIds": true,
+    "showDisplayNames": true,
+    "idFontSize": 11,
+    "nameFontSize": 15,
+    "nameEllipsis": true
+  },
+  "oopz": {
+    "mode": "oopz-local"
+  },
+  "oopzLocal": {
+    "host": "127.0.0.1",
+    "port": 10274,
+    "path": "/",
+    "reconnectDelaySeconds": 2
+  },
+  "mock": {
+    "speakingIntervalMs": 1600,
+    "users": [
+      {
+        "id": "player-001",
+        "displayName": "Player One",
+        "avatarUrl": ""
+      },
+      {
+        "id": "player-002",
+        "displayName": "Player Two",
+        "avatarUrl": ""
+      },
+      {
+        "id": "player-003",
+        "displayName": "Player Three",
+        "avatarUrl": ""
+      }
+    ]
+  }
+}

@@ -35,10 +35,31 @@ ws://127.0.0.1:10274/
 - 根据成员标识稳定分配不同颜色。
 - 头像从 OOPZ 本地临时缓存读取，并通过本地 `/api/avatar` 安全提供给浏览器源。
 - 保留 `mock` 模式，方便没有打开 OOPZ 时预览界面。
+- 提供**可视化配置编辑器**，支持实时预览叠加层样式与多用户场景。
 - 支持通过交互式 BAT 菜单修改配置，无需手动编辑 JSON。
-- 支持自定义昵称/ID 字体大小、名称框宽度与头像同宽、昵称过长时省略号或换行显示。
+- 支持自定义昵称/ID 字体大小、铭牌自适应宽度、昵称过长时省略号或换行显示。
+- 启动脚本提供中文版与英文版，分别对应中文与英文提示信息。
 
 ## 快速启动
+
+### 从 GitHub 获取
+
+仓库地址：<https://github.com/Butterfly0v0/oopz-obs-speaking-overlay>
+
+**方式一：Git 克隆（推荐）**
+
+```powershell
+git clone https://github.com/Butterfly0v0/oopz-obs-speaking-overlay.git
+cd oopz-obs-speaking-overlay
+```
+
+**方式二：下载 ZIP**
+
+1. 打开上方仓库链接。
+2. 点击 **Code** → **Download ZIP**。
+3. 解压 ZIP 文件，进入 `oopz-obs-speaking-overlay` 文件夹。
+
+### 安装依赖
 
 首次使用前，先安装 requirements。不熟悉终端命令的用户，直接双击：
 
@@ -60,6 +81,8 @@ install-requirements.bat
 python -m pip install -r .\requirements.txt
 ```
 
+### 启动程序
+
 先打开 OOPZ 客户端，并开启 OOPZ 自带屏幕覆盖功能。
 
 不熟悉终端命令的用户，直接双击：
@@ -74,12 +97,16 @@ python -m pip install -r .\requirements.txt
 start-overlay.bat
 ```
 
-也可以通过终端启动：
+- `启动OOPZ OBS叠加层.bat`：启动提示为**中文**。
+- `start-overlay.bat`：启动提示为**英文**。
+
+也可以通过终端启动（需先进入项目目录）：
 
 ```powershell
-cd .\oopz-obs-speaking-overlay
 python .\backend\app.py
 ```
+
+### 打开叠加层
 
 浏览器或 OBS 中打开：
 
@@ -87,12 +114,20 @@ python .\backend\app.py
 http://127.0.0.1:5173/overlay
 ```
 
+可视化配置编辑器（需先启动服务）：
+
+```text
+http://127.0.0.1:5173/config
+```
+
+或双击 `打开配置编辑器.bat` / `open-config-editor.bat`。
+
 ## OBS 接入
 
-1. 在 OBS 中添加"浏览器"源。
+1. 在 OBS 中添加「浏览器」源。
 2. URL 填写 `http://127.0.0.1:5173/overlay`。
 3. 建议初始尺寸使用 `800 x 220`，竖排布局可用 `320 x 600`。
-4. 勾选"关闭源时关闭浏览器源"，方便刷新调试。
+4. 勾选「关闭源时关闭浏览器源」，方便刷新调试。
 5. 页面背景默认透明，可直接叠到直播画面上。
 
 ## 配置
@@ -103,9 +138,28 @@ http://127.0.0.1:5173/overlay
 Copy-Item .\config.example.json .\config.json
 ```
 
-### 交互式配置编辑（推荐）
+### 可视化配置编辑（推荐）
 
-双击运行 `配置设置.bat`（或 `configure.bat`），即可通过命令行菜单修改常用配置：
+先启动叠加层服务，然后打开配置编辑器：
+
+- 双击 `打开配置编辑器.bat`（或 `open-config-editor.bat`）
+- 或在浏览器访问 `http://127.0.0.1:5173/config`
+
+编辑器左侧可调节：
+
+- **布局**：方向、头像尺寸
+- **显示效果**：暗色透明度、非活动灰度、高亮缩放
+- **文字**：昵称/ID 显示开关、字号、省略号
+- **虚拟用户**：手动添加、编辑、删除测试用户，模拟多成员同屏
+- **预览场景**：切换正在说话的用户，查看高亮效果
+
+右侧 iframe 会**实时预览**修改结果。满意后点击「保存配置」，将叠加层样式与虚拟用户一并写入 `config.json`（`overlay` 与 `mock.users`）。
+
+打开编辑器时会自动加载当前配置与虚拟用户，无需手动改动即可看到预览。
+
+### 命令行配置编辑
+
+双击运行 `配置设置.bat`（或 `configure.bat`），可通过命令行菜单修改全部配置（含服务器、OOPZ 连接、Mock 用户等）：
 
 ```text
 ==================================================
@@ -177,6 +231,17 @@ Copy-Item .\config.example.json .\config.json
 - `overlay.nameEllipsis`：`true` 昵称过长显示省略号，`false` 换行显示完整内容。
 - `oopz.mode`：`oopz-local` 使用真实 OOPZ 覆盖层数据；`mock` 使用模拟数据。
 - `oopzLocal.port`：OOPZ 本地覆盖层 WebSocket 端口，当前默认是 `10274`。
+
+## 常用脚本
+
+| 脚本 | 说明 |
+| --- | --- |
+| `启动OOPZ OBS叠加层.bat` | 启动服务（中文提示） |
+| `start-overlay.bat` | 启动服务（英文提示） |
+| `打开配置编辑器.bat` | 在浏览器打开可视化配置编辑器 |
+| `open-config-editor.bat` | 同上（英文文件名） |
+| `配置设置.bat` / `configure.bat` | 命令行交互式配置菜单 |
+| `安装依赖.bat` / `install-requirements.bat` | 检查并安装 Python 依赖 |
 
 ## 探测 OOPZ 数据
 

@@ -2,6 +2,7 @@ const overlay = document.querySelector("#overlay");
 const usersContainer = document.querySelector("#users");
 const status = document.querySelector("#status");
 const template = document.querySelector("#user-card-template");
+const isPreviewMode = new URLSearchParams(window.location.search).get("preview") === "1";
 
 let overlayConfig = {
   layout: "horizontal",
@@ -17,6 +18,7 @@ let overlayConfig = {
 };
 
 const cards = new Map();
+let lastUsers = [];
 
 async function loadConfig() {
   try {
@@ -39,9 +41,37 @@ function applyConfig() {
   document.documentElement.style.setProperty("--name-font-size", `${overlayConfig.nameFontSize}px`);
   document.documentElement.style.setProperty("--name-ellipsis", overlayConfig.nameEllipsis ? "ellipsis" : "clip");
   document.documentElement.style.setProperty("--name-white-space", overlayConfig.nameEllipsis ? "nowrap" : "normal");
+  refreshVisibleCards();
+}
+
+function refreshVisibleCards() {
+  lastUsers.forEach((user) => {
+    const card = cards.get(user.id);
+    if (card) {
+      updateCard(card, user);
+    }
+  });
+}
+
+function handlePreviewMessage(event) {
+  if (event.origin !== window.location.origin) {
+    return;
+  }
+
+  const message = event.data ?? {};
+  if (message.type === "overlay-config-update" && message.overlay) {
+    overlayConfig = { ...overlayConfig, ...message.overlay };
+    applyConfig();
+  }
+  if (message.type === "overlay-preview-state" && message.state) {
+    renderState(message.state);
+  }
 }
 
 function setStatus(message, isError = false) {
+  if (isPreviewMode) {
+    return;
+  }
   status.textContent = message;
   status.classList.toggle("status--error", isError);
   status.hidden = !message;
@@ -67,6 +97,7 @@ function connectEvents() {
 function renderState(state) {
   const seenIds = new Set();
   const users = state.users ?? [];
+  lastUsers = users;
 
   users.forEach((user) => {
     seenIds.add(user.id);
@@ -79,6 +110,10 @@ function renderState(state) {
       card.remove();
       cards.delete(id);
     }
+  }
+
+  if (isPreviewMode) {
+    return;
   }
 
   if (!state.connected && users.length === 0) {
@@ -116,9 +151,12 @@ function updateCard(card, user) {
   card.classList.toggle("user-card--muted", Boolean(user.muted));
   card.style.setProperty("--user-color", color);
 
-  displayName.textContent = user.displayName || user.id;
+  const label = user.displayName || user.id;
+  displayName.textContent = label;
+  displayName.title = label;
   displayName.hidden = !overlayConfig.showDisplayNames;
   userId.textContent = user.id;
+  userId.title = user.id;
   userId.hidden = !overlayConfig.showIds || sameText(user.id, user.displayName);
 
   fallback.textContent = initials(user.displayName || user.id);
@@ -159,5 +197,13 @@ function clamp01(value) {
   return Math.min(1, Math.max(0, number));
 }
 
+if (isPreviewMode) {
+  status.hidden = true;
+  window.addEventListener("message", handlePreviewMessage);
+}
+
 await loadConfig();
-connectEvents();
+
+if (!isPreviewMode) {
+  connectEvents();
+}

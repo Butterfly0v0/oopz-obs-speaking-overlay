@@ -143,8 +143,9 @@ body {
   flex-direction: column;
   align-items: center;
   gap: 2px;
-  min-width: 0;
-  max-width: calc(var(--avatar-size) + 10px);
+  min-width: calc(var(--avatar-size) + 10px);
+  width: max-content;
+  max-width: 240px;
   padding: 6px 10px;
   border: 1px solid color-mix(in srgb, var(--user-color) 62%, transparent);
   border-radius: 12px;

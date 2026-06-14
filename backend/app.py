@@ -32,6 +32,34 @@ def load_config() -> dict[str, Any]:
         return json.load(file)
 
 
+def ensure_config_file() -> Path:
+    if not DEFAULT_CONFIG.exists():
+        DEFAULT_CONFIG.write_text(EXAMPLE_CONFIG.read_text(encoding="utf-8"), encoding="utf-8")
+    return DEFAULT_CONFIG
+
+
+def save_overlay_config(config: dict[str, Any], overlay: dict[str, Any], mock_users: list[dict[str, Any]] | None = None) -> dict[str, Any]:
+    config_path = ensure_config_file()
+    stored = load_config()
+    stored["overlay"] = {**stored.get("overlay", {}), **overlay}
+    if mock_users is not None:
+        stored.setdefault("mock", {})
+        stored["mock"]["users"] = mock_users
+    with config_path.open("w", encoding="utf-8") as file:
+        json.dump(stored, file, ensure_ascii=False, indent=2)
+        file.write("\n")
+    config["overlay"] = stored["overlay"]
+    if mock_users is not None:
+        config.setdefault("mock", {})
+        config["mock"]["users"] = mock_users
+    return {
+        "overlay": stored["overlay"],
+        "mock": {
+            "users": stored.get("mock", {}).get("users", []),
+        },
+    }
+
+
 class OverlayServer(ThreadingHTTPServer):
     def __init__(self, address: tuple[str, int], config: dict[str, Any]) -> None:
         super().__init__(address, OverlayRequestHandler)
@@ -61,6 +89,9 @@ class OverlayRequestHandler(BaseHTTPRequestHandler):
         if path in ("/", "/overlay"):
             self.serve_file(FRONTEND / "index.html")
             return
+        if path in ("/config", "/editor"):
+            self.serve_file(FRONTEND / "config-editor.html")
+            return
         if path == "/api/state":
             self.send_json(self.server.provider.snapshot().as_dict())
             return
@@ -78,12 +109,43 @@ class OverlayRequestHandler(BaseHTTPRequestHandler):
             return
         self.send_error(HTTPStatus.NOT_FOUND, "Not found")
 
+    def do_POST(self) -> None:
+        parsed = urlparse(self.path)
+        if parsed.path != "/api/config":
+            self.send_error(HTTPStatus.NOT_FOUND, "Not found")
+            return
+
+        length = int(self.headers.get("Content-Length", "0"))
+        try:
+            payload = json.loads(self.rfile.read(length).decode("utf-8"))
+        except (json.JSONDecodeError, UnicodeDecodeError):
+            self.send_error(HTTPStatus.BAD_REQUEST, "Invalid JSON body")
+            return
+
+        overlay = payload.get("overlay")
+        if not isinstance(overlay, dict):
+            self.send_error(HTTPStatus.BAD_REQUEST, "Missing overlay object")
+            return
+
+        mock_users = payload.get("mockUsers")
+        if mock_users is not None and not isinstance(mock_users, list):
+            self.send_error(HTTPStatus.BAD_REQUEST, "mockUsers must be an array")
+            return
+
+        saved = save_overlay_config(self.server.config, overlay, mock_users)
+        if mock_users is not None and str(self.server.config.get("oopz", {}).get("mode", "oopz-local")).lower() == "mock":
+            self.server.provider = build_provider(self.server.config)
+        self.send_json({"ok": True, **saved})
+
     def public_config(self) -> dict[str, Any]:
         config = self.server.config
         return {
             "overlay": config.get("overlay", {}),
             "oopz": {
                 "mode": config.get("oopz", {}).get("mode", "oopz-local"),
+            },
+            "mock": {
+                "users": config.get("mock", {}).get("users", []),
             },
         }
 
@@ -168,6 +230,7 @@ def main() -> None:
 
     httpd = OverlayServer((host, port), config)
     print(f"OOPZ OBS overlay server running at http://{host}:{port}/overlay")
+    print(f"Visual config editor available at http://{host}:{port}/config")
     print("Keep OOPZ and its built-in overlay enabled while this server is running.")
     print("Press Ctrl+C to stop.")
     try:

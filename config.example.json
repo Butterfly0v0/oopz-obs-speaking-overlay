@@ -12,9 +12,20 @@
     "highlightScale": 1.06,
     "showIds": true,
     "showDisplayNames": true,
+    "fontFamily": "Microsoft YaHei",
+    "fontStyle": "Regular",
+    "fontFace": "Microsoft YaHei",
     "idFontSize": 11,
     "nameFontSize": 15,
-    "nameEllipsis": true
+    "nameFontWeight": 800,
+    "idFontWeight": 600,
+    "nameLetterSpacing": 0,
+    "idLetterSpacing": 0.02,
+    "nameEllipsis": true,
+    "speakFloatEnabled": true,
+    "speakFloatAmplitude": 6,
+    "speakFloatDuration": 1.2,
+    "speakFloatEase": "ease-in-out"
   },
   "oopz": {
     "mode": "oopz-local"

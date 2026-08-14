@@ -140,13 +140,31 @@ body {
 }
 
 .field select,
-.field input[type="text"] {
+.field input[type="text"],
+.field input[type="search"] {
   width: 100%;
   padding: 10px 12px;
   border: 1px solid var(--panel-border);
   border-radius: 10px;
   background: #0f1218;
   color: var(--text);
+}
+
+.font-family-select {
+  height: 220px;
+  padding: 6px;
+  font-family: inherit;
+}
+
+.font-family-select option {
+  padding: 6px 8px;
+  border-radius: 6px;
+}
+
+.field-row {
+  display: flex;
+  gap: 8px;
+  margin: -4px 0 14px;
 }
 
 .field input[type="range"] {

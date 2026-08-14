@@ -4,14 +4,19 @@
   --inactive-grayscale: 0.7;
   --highlight-scale: 1.06;
   --panel-blur: 16px;
+  --overlay-font-family: "Microsoft YaHei", "Segoe UI", system-ui, sans-serif;
+  --overlay-font-style: normal;
   --id-font-size: 11px;
   --name-font-size: 15px;
+  --name-font-weight: 800;
+  --id-font-weight: 600;
+  --name-letter-spacing: 0em;
+  --id-letter-spacing: 0.02em;
+  --speak-float-amplitude: 6px;
+  --speak-float-duration: 1.2s;
+  --speak-float-ease: ease-in-out;
   color-scheme: dark;
-  font-family:
-    "Microsoft YaHei",
-    "Segoe UI",
-    system-ui,
-    sans-serif;
+  font-family: var(--overlay-font-family);
 }
 
 * {
@@ -104,9 +109,11 @@ body {
   box-shadow:
     0 0 0 2px rgb(0 0 0 / 0.35),
     0 0 18px rgb(0 0 0 / 0.55);
+  translate: 0 0;
   transition:
     box-shadow 160ms ease,
-    border-color 160ms ease;
+    border-color 160ms ease,
+    translate 160ms ease;
 }
 
 .user-card--speaking .avatar-wrap {
@@ -115,6 +122,21 @@ body {
     0 0 0 2px rgb(255 255 255 / 0.14),
     0 0 22px color-mix(in srgb, var(--user-color) 72%, transparent),
     0 0 46px color-mix(in srgb, var(--user-color) 42%, transparent);
+}
+
+.overlay--speak-float .user-card--speaking .avatar-wrap {
+  animation: speak-float var(--speak-float-duration) var(--speak-float-ease) infinite;
+}
+
+@keyframes speak-float {
+  0%,
+  100% {
+    translate: 0 0;
+  }
+
+  50% {
+    translate: 0 calc(-1 * var(--speak-float-amplitude));
+  }
 }
 
 .avatar,
@@ -172,7 +194,9 @@ body {
 .display-name {
   color: white;
   font-size: var(--name-font-size);
-  font-weight: 800;
+  font-weight: var(--name-font-weight);
+  font-style: var(--overlay-font-style);
+  letter-spacing: var(--name-letter-spacing);
   text-overflow: var(--name-ellipsis, ellipsis);
   white-space: var(--name-white-space, nowrap);
 }
@@ -180,7 +204,9 @@ body {
 .user-id {
   color: rgb(255 255 255 / 0.72);
   font-size: var(--id-font-size);
-  font-weight: 600;
+  font-weight: var(--id-font-weight);
+  font-style: var(--overlay-font-style);
+  letter-spacing: var(--id-letter-spacing);
   text-overflow: ellipsis;
   white-space: nowrap;
 }

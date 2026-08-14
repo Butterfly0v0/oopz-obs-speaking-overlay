@@ -18,9 +18,20 @@ MENU_GROUPS = [
         ("overlay.highlightScale", "高亮缩放 (如 1.06)"),
         ("overlay.showIds", "显示ID [true / false]"),
         ("overlay.showDisplayNames", "显示昵称 [true / false]"),
+        ("overlay.fontFamily", "字体族 (本机字体名，如 Microsoft YaHei)"),
+        ("overlay.fontStyle", "字体样式 [Regular / Bold / Light / ...]"),
+        ("overlay.fontFace", "实际字面全名 (可留空，自动由字体+样式推导)"),
         ("overlay.idFontSize", "ID字体大小 (像素)"),
         ("overlay.nameFontSize", "昵称字体大小 (像素)"),
+        ("overlay.nameFontWeight", "昵称字重 (100 ~ 900)"),
+        ("overlay.idFontWeight", "ID字重 (100 ~ 900)"),
+        ("overlay.nameLetterSpacing", "昵称字距 (em)"),
+        ("overlay.idLetterSpacing", "ID字距 (em)"),
         ("overlay.nameEllipsis", "昵称过长用省略号 [true / false]"),
+        ("overlay.speakFloatEnabled", "说话时头像浮动 [true / false]"),
+        ("overlay.speakFloatAmplitude", "浮动幅度 (像素)"),
+        ("overlay.speakFloatDuration", "浮动周期 (秒)"),
+        ("overlay.speakFloatEase", "浮动缓动 [ease-in-out / ease-in / ease-out / ease / linear]"),
     ]),
     ("OOPZ 连接", [
         ("oopz.mode", "数据源模式 [oopz-local / mock]"),
@@ -37,6 +48,7 @@ MENU_GROUPS = [
 VALIDATORS = {
     "overlay.layout": lambda v: v if v in ("horizontal", "vertical", "grid") else None,
     "oopz.mode": lambda v: v if v in ("oopz-local", "mock") else None,
+    "overlay.speakFloatEase": lambda v: v if v in ("ease-in-out", "ease-in", "ease-out", "ease", "linear") else None,
 }
 
 
@@ -101,6 +113,7 @@ def validate(key, value):
             allowed = {
                 "overlay.layout": "horizontal / vertical / grid",
                 "oopz.mode": "oopz-local / mock",
+                "overlay.speakFloatEase": "ease-in-out / ease-in / ease-out / ease / linear",
             }
             raise ValueError("无效值。允许的值: " + allowed.get(key, "未知"))
         return result

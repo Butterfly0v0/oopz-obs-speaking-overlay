@@ -18,6 +18,7 @@ from typing import Any
 from urllib.parse import parse_qs, urlparse
 
 from state import MockStateProvider, OopzOverlayProvider
+from system_fonts import list_system_fonts
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -97,6 +98,9 @@ class OverlayRequestHandler(BaseHTTPRequestHandler):
             return
         if path == "/api/config":
             self.send_json(self.public_config())
+            return
+        if path == "/api/fonts":
+            self.send_json({"families": list_system_fonts()})
             return
         if path == "/events":
             self.serve_events()

@@ -12,9 +12,20 @@ let overlayConfig = {
   highlightScale: 1.06,
   showIds: true,
   showDisplayNames: true,
+  fontFamily: "Microsoft YaHei",
+  fontStyle: "Regular",
+  fontFace: "Microsoft YaHei",
   idFontSize: 11,
   nameFontSize: 15,
+  nameFontWeight: 800,
+  idFontWeight: 600,
+  nameLetterSpacing: 0,
+  idLetterSpacing: 0.02,
   nameEllipsis: true,
+  speakFloatEnabled: true,
+  speakFloatAmplitude: 6,
+  speakFloatDuration: 1.2,
+  speakFloatEase: "ease-in-out",
 };
 
 const cards = new Map();
@@ -32,15 +43,31 @@ async function loadConfig() {
 }
 
 function applyConfig() {
-  overlay.className = `overlay overlay--${overlayConfig.layout}`;
+  const floatEnabled = Boolean(overlayConfig.speakFloatEnabled);
+  overlay.className = `overlay overlay--${overlayConfig.layout}${floatEnabled ? " overlay--speak-float" : ""}`;
   document.documentElement.style.setProperty("--avatar-size", `${overlayConfig.avatarSize}px`);
   document.documentElement.style.setProperty("--dim-opacity", String(overlayConfig.dimOpacity));
   document.documentElement.style.setProperty("--inactive-grayscale", String(clamp01(overlayConfig.inactiveGrayscale)));
   document.documentElement.style.setProperty("--highlight-scale", String(overlayConfig.highlightScale));
+  document.documentElement.style.setProperty(
+    "--overlay-font-family",
+    toCssFontFamily(resolveFontFace(overlayConfig)),
+  );
+  document.documentElement.style.setProperty(
+    "--overlay-font-style",
+    cssFontStyleFromFaceStyle(overlayConfig.fontStyle),
+  );
   document.documentElement.style.setProperty("--id-font-size", `${overlayConfig.idFontSize}px`);
   document.documentElement.style.setProperty("--name-font-size", `${overlayConfig.nameFontSize}px`);
+  document.documentElement.style.setProperty("--name-font-weight", String(overlayConfig.nameFontWeight ?? 800));
+  document.documentElement.style.setProperty("--id-font-weight", String(overlayConfig.idFontWeight ?? 600));
+  document.documentElement.style.setProperty("--name-letter-spacing", `${Number(overlayConfig.nameLetterSpacing ?? 0)}em`);
+  document.documentElement.style.setProperty("--id-letter-spacing", `${Number(overlayConfig.idLetterSpacing ?? 0.02)}em`);
   document.documentElement.style.setProperty("--name-ellipsis", overlayConfig.nameEllipsis ? "ellipsis" : "clip");
   document.documentElement.style.setProperty("--name-white-space", overlayConfig.nameEllipsis ? "nowrap" : "normal");
+  document.documentElement.style.setProperty("--speak-float-amplitude", `${Number(overlayConfig.speakFloatAmplitude ?? 6)}px`);
+  document.documentElement.style.setProperty("--speak-float-duration", `${Number(overlayConfig.speakFloatDuration ?? 1.2)}s`);
+  document.documentElement.style.setProperty("--speak-float-ease", overlayConfig.speakFloatEase || "ease-in-out");
   refreshVisibleCards();
 }
 
@@ -195,6 +222,87 @@ function clamp01(value) {
     return 0.7;
   }
   return Math.min(1, Math.max(0, number));
+}
+
+function extractPrimaryFont(fontFamily) {
+  const raw = String(fontFamily ?? "").trim();
+  if (!raw) {
+    return "Microsoft YaHei";
+  }
+  const match = raw.match(/"([^"]+)"|'([^']+)'|([^,]+)/);
+  return String(match?.[1] || match?.[2] || match?.[3] || raw).trim();
+}
+
+function canonicalizeFontStyle(value) {
+  const raw = String(value ?? "Regular").trim();
+  if (!raw) {
+    return "Regular";
+  }
+  const lowered = raw.toLowerCase();
+  const legacy = {
+    normal: "Regular",
+    regular: "Regular",
+    book: "Regular",
+    roman: "Regular",
+    italic: "Italic",
+    oblique: "Oblique",
+    bold: "Bold",
+    light: "Light",
+    medium: "Medium",
+    black: "Black",
+    thin: "Thin",
+    heavy: "Heavy",
+    semibold: "SemiBold",
+    "semi bold": "SemiBold",
+    demibold: "SemiBold",
+    extrabold: "ExtraBold",
+    "extra bold": "ExtraBold",
+    extralight: "ExtraLight",
+    "extra light": "ExtraLight",
+    "bold italic": "Bold Italic",
+    bolditalic: "Bold Italic",
+  };
+  if (legacy[lowered]) {
+    return legacy[lowered];
+  }
+  return raw
+    .split(/\s+/)
+    .filter(Boolean)
+    .map((part) => part[0].toUpperCase() + part.slice(1))
+    .join(" ");
+}
+
+function resolveFontFace(config) {
+  const face = String(config.fontFace ?? "").trim();
+  if (face) {
+    return extractPrimaryFont(face);
+  }
+  const family = extractPrimaryFont(config.fontFamily);
+  const style = canonicalizeFontStyle(config.fontStyle);
+  if (style === "Regular") {
+    return family;
+  }
+  return `${family} ${style}`;
+}
+
+function toCssFontFamily(fontFamily) {
+  const primary = extractPrimaryFont(fontFamily);
+  if (!primary || primary === "system-ui") {
+    return "system-ui, sans-serif";
+  }
+  const escaped = primary.replaceAll('"', '\\"');
+  return `"${escaped}", "Microsoft YaHei", "Segoe UI", system-ui, sans-serif`;
+}
+
+function cssFontStyleFromFaceStyle(value) {
+  const style = canonicalizeFontStyle(value).toLowerCase();
+  if (style.includes("oblique")) {
+    return "oblique";
+  }
+  if (style.includes("italic")) {
+    return "italic";
+  }
+  return "normal";
 }
 
 if (isPreviewMode) {

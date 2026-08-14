@@ -55,7 +55,49 @@
             </section>
 
             <section class="form-section">
+              <h2>说话浮动</h2>
+              <p class="section-hint">说话中的用户头像会上下浮动，可单独调节幅度、周期与缓动。</p>
+              <label class="field field--checkbox">
+                <input type="checkbox" name="speakFloatEnabled" id="speakFloatEnabled" />
+                <span>启用说话时头像浮动</span>
+              </label>
+              <label class="field field--range">
+                <span>浮动幅度 <strong id="speakFloatAmplitude-value"></strong></span>
+                <input type="range" name="speakFloatAmplitude" id="speakFloatAmplitude" min="0" max="24" step="1" />
+              </label>
+              <label class="field field--range">
+                <span>浮动周期 <strong id="speakFloatDuration-value"></strong></span>
+                <input type="range" name="speakFloatDuration" id="speakFloatDuration" min="0.3" max="3" step="0.05" />
+              </label>
+              <label class="field">
+                <span>缓动曲线</span>
+                <select name="speakFloatEase" id="speakFloatEase">
+                  <option value="ease-in-out">ease-in-out（平滑）</option>
+                  <option value="ease-in">ease-in（加速）</option>
+                  <option value="ease-out">ease-out（减速）</option>
+                  <option value="ease">ease（默认）</option>
+                  <option value="linear">linear（匀速）</option>
+                </select>
+              </label>
+            </section>
+
+            <section class="form-section">
               <h2>文字</h2>
+              <label class="field">
+                <span>搜索本机字体</span>
+                <input type="search" id="fontSearch" placeholder="输入关键字过滤，例如 雅黑 / Arial" autocomplete="off" />
+              </label>
+              <label class="field">
+                <span>字体 <strong id="fontList-meta"></strong></span>
+                <select name="fontFamily" id="fontFamily" class="font-family-select" size="10"></select>
+              </label>
+              <div class="field-row">
+                <button type="button" id="refresh-fonts-btn" class="btn btn--ghost btn--small">刷新本机字体</button>
+              </div>
+              <label class="field">
+                <span>字体样式</span>
+                <select name="fontStyle" id="fontStyle"></select>
+              </label>
               <label class="field field--checkbox">
                 <input type="checkbox" name="showDisplayNames" id="showDisplayNames" />
                 <span>显示昵称</span>
@@ -71,6 +113,22 @@
               <label class="field field--range">
                 <span>ID 字号 <strong id="idFontSize-value"></strong></span>
                 <input type="range" name="idFontSize" id="idFontSize" min="8" max="24" step="1" />
+              </label>
+              <label class="field field--range">
+                <span>昵称字重 <strong id="nameFontWeight-value"></strong></span>
+                <input type="range" name="nameFontWeight" id="nameFontWeight" min="100" max="900" step="100" />
+              </label>
+              <label class="field field--range">
+                <span>ID 字重 <strong id="idFontWeight-value"></strong></span>
+                <input type="range" name="idFontWeight" id="idFontWeight" min="100" max="900" step="100" />
+              </label>
+              <label class="field field--range">
+                <span>昵称字距 <strong id="nameLetterSpacing-value"></strong></span>
+                <input type="range" name="nameLetterSpacing" id="nameLetterSpacing" min="-0.05" max="0.2" step="0.01" />
+              </label>
+              <label class="field field--range">
+                <span>ID 字距 <strong id="idLetterSpacing-value"></strong></span>
+                <input type="range" name="idLetterSpacing" id="idLetterSpacing" min="-0.05" max="0.2" step="0.01" />
               </label>
               <label class="field field--checkbox">
                 <input type="checkbox" name="nameEllipsis" id="nameEllipsis" />

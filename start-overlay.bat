@@ -59,26 +59,38 @@ if /i "%OVERLAY_LANG%"=="zh" (
 )
 echo.
 
-where python >nul 2>nul
+call "%~dp0scripts\ensure-python.bat"
 if errorlevel 1 (
+  echo.
   if /i "%OVERLAY_LANG%"=="zh" (
-    echo 未找到 Python。
-    echo 请安装 Python 3.10 或更高版本，并勾选「Add Python to PATH」。
+    echo 未检测到可用的 Python 3.10 或更高版本。
+    echo Windows 自带的 python 占位程序不能运行本程序。
+    echo 请先运行「安装依赖.bat」完成安装，然后再启动叠加层。
   ) else (
-    echo Python was not found.
-    echo Please install Python 3.10 or newer and enable "Add Python to PATH".
+    echo Python 3.10 or newer is not available.
+    echo The Windows python placeholder cannot run this program.
+    echo Run "install-requirements.bat" first, then start the overlay again.
   )
   echo.
   pause
   exit /b 1
 )
 
-python ".\backend\app.py"
+"%PYTHON_EXE%" ".\backend\app.py"
+set "PYEXIT=%ERRORLEVEL%"
 
 echo.
-if /i "%OVERLAY_LANG%"=="zh" (
-  echo 服务已停止。
+if not "%PYEXIT%"=="0" (
+  if /i "%OVERLAY_LANG%"=="zh" (
+    echo 启动失败，退出码 %PYEXIT%。请查看上面的报错。
+  ) else (
+    echo Startup failed with exit code %PYEXIT%. See the error above.
+  )
 ) else (
-  echo Server stopped.
+  if /i "%OVERLAY_LANG%"=="zh" (
+    echo 服务已停止。
+  ) else (
+    echo Server stopped.
+  )
 )
 pause

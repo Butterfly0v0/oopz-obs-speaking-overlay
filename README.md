@@ -80,7 +80,7 @@ cd oopz-obs-speaking-overlay
 install-requirements.bat
 ```
 
-当前版本只使用 Python 标准库，`requirements.txt` 暂无第三方依赖；保留安装步骤是为了检查 Python/pip 环境并方便后续扩展。
+当前版本只使用 Python 标准库，`requirements.txt` 暂无第三方依赖。安装脚本仍会检查 Python：没有可用的 Python 3.10 或更高版本时，会自动安装 Python 3.14，只安装给当前用户。Windows 自带的 Python 占位程序不算已安装。
 
 也可以通过终端安装：
 
@@ -106,6 +106,8 @@ start-overlay.bat
 
 - `启动OOPZ OBS叠加层.bat`：启动提示为**中文**。
 - `start-overlay.bat`：启动提示为**英文**。
+
+启动时只检查 Python，不会自动安装。没有可用 Python 时，请先运行「安装依赖.bat」。
 
 也可以通过终端启动（需先进入项目目录）：
 

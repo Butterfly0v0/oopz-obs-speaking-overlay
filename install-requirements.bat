@@ -4,6 +4,8 @@ setlocal
 
 cd /d "%~dp0"
 
+if not defined OVERLAY_LANG set "OVERLAY_LANG=en"
+
 if "%~1"=="--check" (
   echo install-requirements ok
   exit /b 0
@@ -11,28 +13,42 @@ if "%~1"=="--check" (
 
 echo.
 echo ================================================
-echo   Install Requirements
+if /i "%OVERLAY_LANG%"=="zh" (
+  echo   安装依赖
+) else (
+  echo   Install Requirements
+)
 echo ================================================
 echo.
 
-where python >nul 2>nul
+call "%~dp0scripts\ensure-python.bat" --install
 if errorlevel 1 (
-  echo Python was not found.
-  echo Please install Python 3.10 or newer and enable "Add Python to PATH".
   echo.
   pause
   exit /b 1
 )
 
-echo Installing packages from requirements.txt...
-python -m pip install -r ".\requirements.txt"
+if /i "%OVERLAY_LANG%"=="zh" (
+  echo 正在安装 requirements.txt 中的依赖...
+) else (
+  echo Installing packages from requirements.txt...
+)
+"%PYTHON_EXE%" -m pip install -r ".\requirements.txt"
 if errorlevel 1 (
   echo.
-  echo Installation failed. Please check the error above.
+  if /i "%OVERLAY_LANG%"=="zh" (
+    echo 安装失败，请查看上面的报错。
+  ) else (
+    echo Installation failed. Please check the error above.
+  )
   pause
   exit /b 1
 )
 
 echo.
-echo Requirements installed successfully.
+if /i "%OVERLAY_LANG%"=="zh" (
+  echo 依赖已安装完成。
+) else (
+  echo Requirements installed successfully.
+)
 pause

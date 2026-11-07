@@ -13,13 +13,21 @@ if not exist "config.json" (
     )
 )
 
-where python >nul 2>nul
-if %errorlevel% neq 0 (
-    echo Error: Python not found. Please install Python and add it to PATH.
+call "%~dp0scripts\ensure-python.bat"
+if errorlevel 1 (
+    echo.
+    if /i "%OVERLAY_LANG%"=="zh" (
+        echo 未检测到可用的 Python 3.10 或更高版本。
+        echo 请先运行「安装依赖.bat」完成安装。
+    ) else (
+        echo Python 3.10 or newer is not available.
+        echo Run "install-requirements.bat" first.
+    )
+    echo.
     pause
     exit /b 1
 )
 
-python "%~dp0scripts\config_editor.py"
+"%PYTHON_EXE%" "%~dp0scripts\config_editor.py"
 set "PYEXIT=%errorlevel%"
 exit /b %PYEXIT%

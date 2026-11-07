@@ -21,12 +21,15 @@ set "PYTHON_VERSION=unknown"
 "%PYTHON_EXE%" -c "import sys; print(sys.version.split()[0])" > "%TEMP%\oopz-python-version.txt" 2>nul
 set /p PYTHON_VERSION=<"%TEMP%\oopz-python-version.txt"
 del "%TEMP%\oopz-python-version.txt" >nul 2>&1
-if /i "%OVERLAY_LANG%"=="zh" (
-  echo 使用 Python %PYTHON_VERSION%
-) else (
-  echo Using Python %PYTHON_VERSION%
-)
+if /i "%OVERLAY_LANG%"=="zh" goto :ready_zh
+echo Using Python %PYTHON_VERSION%
 echo.
+goto :ready_export
+:ready_zh
+set "MESSAGE=使用 Python %PYTHON_VERSION%"
+call :say
+echo.
+:ready_export
 endlocal & set "PYTHON_EXE=%PYTHON_EXE%" & exit /b 0
 
 :install_exit_fail
@@ -134,53 +137,22 @@ exit /b 1
 
 :install_python
 echo.
-if /i "%OVERLAY_LANG%"=="zh" (
-  echo 未检测到可用的 Python 3.10 或更高版本。
-  echo Windows 自带的 python 占位程序不能运行本程序。
-  echo 正在自动安装 Python 3.14，仅当前用户，不需要管理员权限。
-  echo 安装可能需要几分钟，请等待结束。
-) else (
-  echo Python 3.10 or newer is not available.
-  echo The Windows python placeholder cannot run this program.
-  echo Installing Python 3.14 for the current user.
-  echo This can take a few minutes.
-)
-echo.
-
-winget --version >nul 2>&1
-if errorlevel 1 goto :no_winget
-
-if /i "%OVERLAY_LANG%"=="zh" (
-  echo 正在通过 winget 安装 Python 3.14 ...
-) else (
-  echo Installing Python 3.14 with winget ...
-)
-winget install --id Python.Python.3.14 -e --scope user --accept-package-agreements --accept-source-agreements --disable-interactivity
-call :find_python
-if not errorlevel 1 exit /b 0
-echo.
-if /i "%OVERLAY_LANG%"=="zh" (
-  echo winget 未能提供可用的 Python，改为从 python.org 下载。
-) else (
-  echo winget did not provide a usable Python. Downloading from python.org.
-)
-echo.
+if /i "%OVERLAY_LANG%"=="zh" goto :install_msg_zh
+echo Python 3.10 or newer is not available.
+echo Downloading and installing Python 3.14 for the current user.
+echo If an installer window appears, wait until it finishes. Do not cancel it.
 goto :download_python
 
-:no_winget
-if /i "%OVERLAY_LANG%"=="zh" (
-  echo 未找到可用的 winget，改为从 python.org 下载。
-) else (
-  echo winget is not available. Downloading from python.org.
-)
-echo.
+:install_msg_zh
+set "MESSAGE=未检测到可用的 Python。"
+call :say
+set "MESSAGE=正在下载并安装 Python 3.14，只安装给当前用户。"
+call :say
+set "MESSAGE=如果出现安装窗口，请等待它结束，不要点取消。"
+call :say
 
 :download_python
-if /i "%OVERLAY_LANG%"=="zh" (
-  echo 正在从 python.org 下载并安装 Python 3.14 ...
-) else (
-  echo Downloading and installing Python 3.14 from python.org ...
-)
+echo.
 powershell -NoProfile -ExecutionPolicy Bypass -File "%~dp0install-python.ps1"
 if errorlevel 1 goto :install_failed
 call :find_python
@@ -189,13 +161,23 @@ exit /b 0
 
 :install_failed
 echo.
-if /i "%OVERLAY_LANG%"=="zh" (
-  echo 自动安装 Python 失败。
-  echo 请打开下面的页面，手动安装 Python 3.10 或更高版本，并勾选 Add python.exe to PATH。
-  echo https://www.python.org/downloads/windows/
-) else (
-  echo Automatic Python installation failed.
-  echo Install Python 3.10 or newer from the page below, and enable Add python.exe to PATH.
-  echo https://www.python.org/downloads/windows/
-)
+if /i "%OVERLAY_LANG%"=="zh" goto :install_failed_zh
+echo Automatic Python installation failed.
+echo Install Python 3.10 or newer from the page below, and enable Add python.exe to PATH.
+echo https://www.python.org/downloads/windows/
 exit /b 1
+
+:install_failed_zh
+set "MESSAGE=自动安装 Python 失败。"
+call :say
+set "MESSAGE=请打开下面的页面，手动安装 Python 3.10 或更高版本。"
+call :say
+echo https://www.python.org/downloads/windows/
+exit /b 1
+
+:say
+setlocal EnableDelayedExpansion
+<nul set /p "=!MESSAGE!"
+echo(
+endlocal
+exit /b 0

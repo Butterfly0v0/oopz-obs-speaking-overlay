@@ -12,13 +12,23 @@ if not exist "config.json" (
 
 echo.
 echo ================================================
-echo   OOPZ Overlay 可视化配置编辑器
+set "MESSAGE=  OOPZ Overlay 可视化配置编辑器"
+call :say
 echo ================================================
 echo.
-echo 请确保叠加层服务已启动（运行 start-overlay.bat）。
-echo 即将在浏览器中打开配置编辑器：
+set "MESSAGE=请确保叠加层服务已启动（运行 start-overlay.bat）。"
+call :say
+set "MESSAGE=即将在浏览器中打开配置编辑器："
+call :say
 echo   http://127.0.0.1:5173/config
 echo.
 
 start "" "http://127.0.0.1:5173/config"
+exit /b 0
+
+:say
+setlocal EnableDelayedExpansion
+<nul set /p "=!MESSAGE!"
+echo(
+endlocal
 exit /b 0

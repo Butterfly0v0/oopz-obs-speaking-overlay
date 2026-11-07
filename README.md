@@ -80,7 +80,17 @@ cd oopz-obs-speaking-overlay
 install-requirements.bat
 ```
 
-当前版本只使用 Python 标准库，`requirements.txt` 暂无第三方依赖。安装脚本仍会检查 Python：没有可用的 Python 3.10 或更高版本时，会自动安装 Python 3.14，只安装给当前用户。Windows 自带的 Python 占位程序不算已安装。
+当前版本只使用 Python 标准库，`requirements.txt` 暂无第三方依赖。安装脚本会检查本机 Python：没有可用的 Python 3.10 或更高版本时，会从 python.org 自动安装 Python 3.14，只安装给当前用户。Windows 自带的 Python 占位程序不算已安装。
+
+没有 Python 时，窗口会显示：
+
+```text
+未检测到可用的 Python。
+正在下载并安装 Python 3.14，只安装给当前用户。
+如果出现安装窗口，请等待它结束，不要点取消。
+```
+
+安装窗口出现后让它自己结束。点取消会导致安装失败。
 
 也可以通过终端安装：
 
@@ -107,7 +117,12 @@ start-overlay.bat
 - `启动OOPZ OBS叠加层.bat`：启动提示为**中文**。
 - `start-overlay.bat`：启动提示为**英文**。
 
-启动时只检查 Python，不会自动安装。没有可用 Python 时，请先运行「安装依赖.bat」。
+启动时只检查 Python，不会自动安装。没有可用 Python 时，窗口会提示：
+
+```text
+未检测到可用的 Python。
+请先启动「安装依赖.bat」。
+```
 
 也可以通过终端启动（需先进入项目目录）：
 
@@ -224,7 +239,7 @@ Copy-Item .\config.example.json .\config.json
 | `打开配置编辑器.bat` | 在浏览器打开可视化配置编辑器 |
 | `open-config-editor.bat` | 同上（英文文件名） |
 | `配置设置.bat` / `configure.bat` | 命令行交互式配置菜单 |
-| `安装依赖.bat` / `install-requirements.bat` | 检查并安装 Python 依赖 |
+| `安装依赖.bat` / `install-requirements.bat` | 检查 Python，缺失时自动安装，然后安装依赖 |
 
 ## 探测 OOPZ 数据
 
@@ -239,5 +254,5 @@ python .\backend\oopz_local_probe.py --seconds 12
 ## 系统要求
 
 - Windows（推荐；本机字体枚举优先使用 Windows 字体注册表）
-- Python 3.10+（使用标准库，无需额外第三方包）
+- Python 3.10 或更高版本。未安装时，运行「安装依赖.bat」会自动安装 Python 3.14。程序只使用标准库，无需额外第三方包
 - 已安装并开启屏幕覆盖的 OOPZ 客户端（真实数据模式）

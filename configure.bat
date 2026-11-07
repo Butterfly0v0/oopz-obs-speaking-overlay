@@ -14,20 +14,26 @@ if not exist "config.json" (
 )
 
 call "%~dp0scripts\ensure-python.bat"
-if errorlevel 1 (
-    echo.
-    if /i "%OVERLAY_LANG%"=="zh" (
-        echo 未检测到可用的 Python 3.10 或更高版本。
-        echo 请先运行「安装依赖.bat」完成安装。
-    ) else (
-        echo Python 3.10 or newer is not available.
-        echo Run "install-requirements.bat" first.
-    )
-    echo.
-    pause
-    exit /b 1
-)
+if errorlevel 1 goto :python_missing
 
 "%PYTHON_EXE%" "%~dp0scripts\config_editor.py"
 set "PYEXIT=%errorlevel%"
 exit /b %PYEXIT%
+
+:python_missing
+echo.
+if /i not "%OVERLAY_LANG%"=="zh" goto :python_missing_en
+<nul set /p "=未检测到可用的 Python。"
+echo(
+<nul set /p "=请先启动「安装依赖.bat」。"
+echo(
+echo.
+pause
+exit /b 1
+
+:python_missing_en
+echo Python was not found.
+echo Run install-requirements.bat first.
+echo.
+pause
+exit /b 1

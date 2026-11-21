@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import json
 import mimetypes
+import os
 import sys
 import tempfile
 import time
@@ -169,9 +170,8 @@ class OverlayRequestHandler(BaseHTTPRequestHandler):
 
         try:
             avatar_path = Path(raw_path).resolve(strict=True)
-            allowed_root = (Path(tempfile.gettempdir()) / "oopz").resolve()
-            if avatar_path != allowed_root and allowed_root not in avatar_path.parents:
-                self.send_error(HTTPStatus.FORBIDDEN, "Avatar path is outside OOPZ temp cache")
+            if not avatar_path_is_allowed(avatar_path):
+                self.send_error(HTTPStatus.FORBIDDEN, "Avatar path is outside OOPZ cache")
                 return
             body = avatar_path.read_bytes()
         except FileNotFoundError:
@@ -224,6 +224,32 @@ class OverlayRequestHandler(BaseHTTPRequestHandler):
                 time.sleep(0.35)
         except (BrokenPipeError, ConnectionResetError):
             return
+
+
+def avatar_cache_roots() -> list[Path]:
+    """Directories OOPZ uses for overlay avatar files."""
+    candidates = [Path(tempfile.gettempdir()) / "oopz"]
+    local_app_data = os.environ.get("LOCALAPPDATA")
+    if local_app_data:
+        candidates.append(Path(local_app_data) / "oopz_cache")
+
+    roots: list[Path] = []
+    seen: set[str] = set()
+    for candidate in candidates:
+        resolved = candidate.resolve()
+        key = str(resolved).casefold()
+        if key in seen:
+            continue
+        seen.add(key)
+        roots.append(resolved)
+    return roots
+
+
+def avatar_path_is_allowed(avatar_path: Path) -> bool:
+    for root in avatar_cache_roots():
+        if avatar_path == root or root in avatar_path.parents:
+            return True
+    return False
 
 
 def main() -> None:

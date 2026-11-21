@@ -36,7 +36,7 @@ ws://127.0.0.1:10274/
 - `voice`：当前是否处于语音频道相关状态。
 - `members`：OOPZ 覆盖层显示的成员列表。
 - `name`：显示名。
-- `avatar`：本地头像缓存路径。
+- `avatar`：本地头像缓存路径。旧版在临时目录的 `oopz` 下，当前版本在 `%LOCALAPPDATA%\oopz_cache` 下。
 - `talking`：是否正在说话。
 - `muted`：是否静音。
 
